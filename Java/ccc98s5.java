@@ -1,6 +1,6 @@
 import java.util.*;
 import java.io.*;
-public class CCC98S5 {
+public class ccc98s5 {
     public static void main(String[] args) throws IOException {
         int n, minox, j, k, oxused;
         int[][] grid;

@@ -48,14 +48,14 @@ public class ncco4d1p3 {
         System.out.println(discheck[N]);
 
     }
-}
-class e implements Comparable<e>{
-    int v, c;
-    e(int v1, int c1){
-        v = v1;
-        c = c1;
-    }
-    public int compareTo(e i){
-        return Integer.compare(c, i.c);
+    private static class e implements Comparable<e>{
+        int v, c;
+        e(int v1, int c1){
+            v = v1;
+            c = c1;
+        }
+        public int compareTo(e i){
+            return Integer.compare(c, i.c);
+        }
     }
 }

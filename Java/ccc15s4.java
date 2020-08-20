@@ -59,17 +59,17 @@ public class ccc15s4 {
             System.out.println(min);
         }
     }
-}
-class node implements Comparable<node>{
-    int v, w, c;
-    node (int v, int w, int c){
-        this.v = v;
-        this.w = w;
-        this.c = c;
-    }
+    private static class node implements Comparable<node>{
+        int v, w, c;
+        node (int v, int w, int c){
+            this.v = v;
+            this.w = w;
+            this.c = c;
+        }
 
-    @Override
-    public int compareTo(node o) {
-        return w - o.w;
+        @Override
+        public int compareTo(node o) {
+            return w - o.w;
+        }
     }
 }

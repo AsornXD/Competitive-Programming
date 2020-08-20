@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
-public class cco12P2 {
+public class cco12p2 {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader( new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -51,14 +51,16 @@ public class cco12P2 {
             System.out.println(-1);
         }
     }
-}
-class e implements Comparable<e>{
-    int v, c;
-    e(int v1, int c1){
-        v = v1;
-        c = c1;
+
+    private static class e implements Comparable<e>{
+        int v, c;
+        e(int v1, int c1){
+            v = v1;
+            c = c1;
+        }
+        public int compareTo(e i){
+            return Integer.compare(c, i.c);
+        }
     }
-    public int compareTo(e i){
-        return Integer.compare(c, i.c);
-    }
 }
+
