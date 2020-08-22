@@ -1,115 +1,123 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class nccc2s5 {
-    public static int[] ds;
-    public static ArrayList<pair>[] gclone;
+    static ArrayList<Pair>[] g;
+    static Edge[] edges;
+    static int[] ds;
+    static int N, M, bb;
+    static long w;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken()), M = Integer.parseInt(st.nextToken());
-        ArrayList<pair>[] g = new ArrayList[N+1];
-        for (int i = 0; i < N+1; i++){
-            g[i] = new ArrayList<>();
-        }
-        int[] dsclone = new int[N+1];
-        Edge[] edges = new Edge[M+1];
-        for (int i = 0; i < N+1; i++){
-            dsclone[i] = i;
-        }
-        edges[0] = new Edge(0, 0, Integer.MIN_VALUE);
-        for (int i = 1; i <= M; i++){
+        N = Integer.parseInt(st.nextToken()); M = Integer.parseInt(st.nextToken());
+        edges = new Edge[M+1];
+        ds = new int[N+1];
+        g = new ArrayList[N+1];
+        edges[0] = new Edge(0,0,Long.MIN_VALUE);
+        for (int i = 1; i < M+1; i++){
             st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken()), b = Integer.parseInt(st.nextToken()), c = Integer.parseInt(st.nextToken());
-            edges[i] = new Edge(a, b, c);
+            edges[i] = new Edge(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), Long.parseLong(st.nextToken()));
         }
-        ds = dsclone.clone();
-            gclone = g.clone();
-            for (Edge e : edges){
-            // System.out.println(e.w);
-            if (e.w != Integer.MIN_VALUE) {
-                union(e);
-            }
-        }
-        int Q = Integer.parseInt((st = new StringTokenizer(br.readLine())).nextToken());
+        kruskal();
+        st = new StringTokenizer(br.readLine());
+        int Q = Integer.parseInt(st.nextToken());
         for (int i = 0; i < Q; i++){
             st = new StringTokenizer(br.readLine());
-            int check = Integer.parseInt(st.nextToken());
-            if (check == 1){
-                edges[Integer.parseInt(st.nextToken())].changew(Integer.parseInt(st.nextToken()));
-                ds = dsclone.clone();
-                gclone = g.clone();
-                for (Edge e : edges){
-                    System.out.println(e.w);
-                    if (e.w != Integer.MIN_VALUE) {
-                        union(e);
-                    }
-                }
+            int t = Integer.parseInt(st.nextToken());
+            if (t == 1){
+                int m = Integer.parseInt(st.nextToken()); long x = Long.parseLong(st.nextToken());
+                Edge temp = edges[m];
+                edges[m] = new Edge(temp.u, temp.v, x);
+                kruskal();
             }
             else{
-                System.out.println("abc: " + dfs(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), -1));
+                int a = Integer.parseInt(st.nextToken());
+                bb = Integer.parseInt(st.nextToken());
+                w = Integer.parseInt(st.nextToken());
+                if (find(a) == find(bb)){
+                    System.out.println(dfs(a));
+                }
+                else{
+                    System.out.println(0);
+                }
             }
         }
     }
-    public static int dfs(int a, int b, int r, int p){
-        if (a == b){
-            return 1;
-        }
-        for (pair i : gclone[a]){
-            System.out.println(a + " " + i.a + " " + i.w);
-            if (i.w >= r && i.a != p && dfs(i.a, b, r, a) == 1){
+
+    static int dfs(int a){
+        PriorityQueue<Pair> pq = new PriorityQueue<Pair>();
+        boolean[] canvis = new boolean[N+1];
+        canvis[a] = true;
+        pq.add(new Pair(a, -1));
+        while (!pq.isEmpty()){
+            Pair cur = pq.poll();
+            if (cur.a == bb){
                 return 1;
+            }
+            for (Pair cur2 : g[cur.a]){
+                if (cur2.b >= w && !canvis[cur2.a]){
+                    pq.add(cur2);
+                    canvis[cur2.a] = true;
+                }
             }
         }
         return 0;
     }
 
-    public static int find(int v){
-        if (ds[v] == v){
-            return v;
+    static void kruskal(){
+        for (int i = 1; i < N+1; i++){
+            ds[i] = i;
+            g[i] = new ArrayList<>();
         }
-        return ds[v] = find(ds[v]);
-    }
-    public static void union(Edge e){
-        int ap = find(e.a), bp = find(e.b);
-        if (ap != bp){
-            gclone[e.a].add(new pair(e.b, e.w));
-            gclone[e.b].add(new pair(e.a, e.w));
-            ds[ap] = bp;
+        Edge[] edgesclone = new Edge[M+1];
+        System.arraycopy(edges, 0, edgesclone, 0, M+1);
+        Arrays.sort(edgesclone, new edgesort());
+        for (int i = 0; i < M; i++){
+            Edge cur = edgesclone[i];
+            int a = find(cur.u), b = find(cur.v);
+            if (a != b){
+                g[cur.u].add(new Pair(cur.v, cur.w));
+                g[cur.v].add(new Pair(cur.u, cur.w));
+                ds[a] = b;
+            }
         }
     }
-    private static class Edge{
-        int a,b,w;
-        public Edge(int a, int b, int w) {
+
+    static int find(int n){
+        if (ds[n] == n){
+            return n;
+        }
+        return ds[n] = find(ds[n]);
+    }
+
+    static class Edge{
+        int u, v;
+        long w;
+        Edge(int u, int v, long w){
+            this.u = u;
+            this.v = v;
+            this.w = w;
+        }
+    }
+    public static class edgesort implements Comparator<Edge>{
+        public int compare(Edge A, Edge B){
+            return Long.compare(B.w, A.w);
+        }
+    }
+    static class Pair implements Comparable<Pair>{
+        int a;
+        long b;
+        Pair(int a, long b){
             this.a = a;
             this.b = b;
-            this.w = w;
         }
-        public void changew(int w){
-            this.w = w;
-        }
-    }
-    private static class pair{
-        int a, w;
-        public pair(int a, int w){
-            this.a = a;
-            this.w = w;
-        }
-    }
-    private static class edgesort implements Comparator<Edge>{
-        public int compare(Edge a, Edge b){
-            if (a.w == Integer.MIN_VALUE || b.w == Integer.MIN_VALUE){
-                return Integer.MIN_VALUE;
-            }
-            return b.w - a.w;
+
+        @Override
+        public int compareTo(Pair o) {
+            return Long.compare(this.b, o.b);
         }
     }
 }
-
-
-
