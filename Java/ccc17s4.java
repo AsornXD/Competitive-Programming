@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 
 public class ccc17s4 {
     static int counter = 0, tn = 0;
+    static long maxw;
     static int[] ds;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -33,7 +34,23 @@ public class ccc17s4 {
         for (Edge e : edges) {
             union(e);
         }
-        System.out.println(Math.max(counter, (N-1)-(tn - counter)));
+        long nowmax = maxw;
+        int days = Math.max(counter, (N-1)-(tn - counter));
+        for (int i = 0; i < N+1; i++){
+            ds[i] = i;
+        }
+        for (Edge e : edges){
+            if (!(find(e.u) == find(e.v))){
+                if (e.c < nowmax || e.ac && e.c == nowmax){
+                    union(e);
+                }
+                else if(e.ac && e.c <= D){
+                    days-=1;
+                    break;
+                }
+            }
+        }
+        System.out.println(days);
     }
 
     public static int find(int v){
@@ -48,6 +65,7 @@ public class ccc17s4 {
         if (up!=vp){
             ds[up] = vp;
             tn++;
+            maxw = Math.max(maxw, e.c);
             if(!e.ac){
                 counter++;
             }
