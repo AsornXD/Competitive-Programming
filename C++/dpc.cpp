@@ -21,4 +21,5 @@ int main(){
         dp[i][2] = max(dp[i-1][1], dp[i-1][0]) + h[i][2];
     }
     printf("%d", max(max(dp[N][0], dp[N][1]), dp[N][2]));
+    return 0;
 }
