@@ -7,21 +7,14 @@ using namespace std;
 typedef long long ll;
 typedef pair<int, int> pii;
 const int MAXN = 2 * 1e5;
-const ll INF = -9000000000000000000;
+const ll INF = -1000000000000000000;
 struct node{
     ll left, right, sumlr, maxlr;
-
-    node(){
-        left = INF;
-        right = INF;
-        sumlr = INF;
-        maxlr = INF;
-    }
 };
 
 ll N, Q, arr[MAXN];
 //pii seginds[2 * MAXN + 1];
-node seg[2 * MAXN + 10];
+node seg[2 * MAXN + 1];
 
 void initialize(int l, int r, int ind){
     if (l == r){
@@ -32,8 +25,8 @@ void initialize(int l, int r, int ind){
         return;
     }
     int mid = (l + r)/2;
-    int l1 = 2 * ind;
-    int r1 = 2 * ind + 1;
+    int l1 = 2 * ind + 1;
+    int r1 = 2 * ind + 2;
     initialize(l, mid, l1);
     initialize(mid + 1, r, r1);
     seg[ind].sumlr = seg[l1].sumlr + seg[r1].sumlr;
@@ -44,17 +37,17 @@ void initialize(int l, int r, int ind){
 }
 
 void update(int uind, int l, int r, int ind, ll val){
-    if (l == r){
-        arr[uind] = val;
-        seg[ind].left = val;
-        seg[ind].right= val;
-        seg[ind].maxlr = val;
-        seg[ind].sumlr = val;
+    if (l == uind && r == uind){
+        arr[l] = val;
+        seg[ind].left = arr[l];
+        seg[ind].right= arr[l];
+        seg[ind].maxlr = arr[l];
+        seg[ind].sumlr = arr[l];
     }
     else{
         int mid = (l + r)/2;
-        int l1 = 2 * ind, r1 = 2 * ind + 1;
-        if (uind <= mid){ update(uind, l, mid, l1, val); } else{ update(uind, mid + 1, r, r1, val); }
+        int l1 = 2 * ind + 1, r1 = 2 * ind + 2;
+        uind <= mid ? update(uind, l, mid, l1, val) : update(uind, mid + 1, r, r1, val);
         seg[ind].sumlr = seg[l1].sumlr + seg[r1].sumlr;
         seg[ind].left = max(seg[l1].left, seg[l1].sumlr + seg[r1].left);
         seg[ind].right = max(seg[r1].right, seg[r1].sumlr + seg[l1].right);
@@ -66,19 +59,16 @@ node query(int ql, int qr, int l, int r, int ind){
     if (ql <= l && qr >= r){
         return seg[ind];
     }
+    if (ql > r || qr < l){
+        return {INF, INF, INF, INF};
+    }
     int mid = (l + r)/2;
-    int l1 = 2 * ind, r1 = 2 * ind + 1;
-    node q1, q2;
-    if (ql <= r && qr >= mid +1){
-        q2 = query(ql, qr, mid + 1, r, r1);
-    }
-    if (qr >= l && ql <= mid){
-        q1 = query(ql, qr, l, mid, l1);
-    }
-    if (q1.maxlr == INF){
+    int l1 = 2 * ind + 1, r1 = 2 * ind + 2;
+    node q1 = query(ql, qr, l, mid, l1), q2 = query(ql, qr, mid + 1, r, r1);
+    if (q1.left == INF){
         return q2;
     }
-    if (q2.maxlr == INF){
+    if (q2.left == INF){
         return q1;
     }
     node curnode;
@@ -91,10 +81,10 @@ node query(int ql, int qr, int l, int r, int ind){
 
 int main(){
    scanf("%lld%lld", &N, &Q);
-   for (int i = 1; i <= N; i++){
+   for (int i = 0; i < N; i++){
        scanf("%lld", &arr[i]);
    }
-   initialize(1, N, 1);
+   initialize(0, N-1, 0);
    char cur;
    for (int i = 0; i < Q; i++){
        scanf("%s", &cur);
@@ -102,14 +92,14 @@ int main(){
            int ii;
            ll xx;
            scanf("%d%lld", &ii, &xx);
-           update(ii, 1, N, 1, xx);
+           update(ii-1, 0, N-1, 0, xx);
 //           printf("a");
        }
        else{
            int cl, cr;
            scanf("%d%d", &cl, &cr);
 //           printf("%d %d\n", seginds[3].first, seginds[3].second);
-           printf("%lld\n", query(cl, cr, 1, N, 1).maxlr);
+           printf("%lld\n", query(cl-1, cr-1, 0, N-1, 0).maxlr);
        }
    }
 }
